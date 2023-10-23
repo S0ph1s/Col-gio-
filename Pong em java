@@ -1,0 +1,90 @@
+// Definir as variáveis do jogo
+const canvas = document.getElementById("pongCanvas");
+const ctx = canvas.getContext("2d");
+const ball = { x: canvas.width / 2, y: canvas.height / 2, radius: 10, speedX: 5, speedY: 5 };
+const paddle = { x: canvas.width / 2 - 50, y: canvas.height - 20, width: 100, height: 10, speed: 8 };
+let leftPressed = false;
+let rightPressed = false;
+
+// Função para desenhar a bola
+function drawBall() {
+  ctx.beginPath();
+  ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+// Função para desenhar a raquete
+function drawPaddle() {
+  ctx.beginPath();
+  ctx.rect(paddle.x, paddle.y, paddle.width, paddle.height);
+  ctx.fillStyle = "#0095DD";
+  ctx.fill();
+  ctx.closePath();
+}
+
+// Função de detecção de colisão da bola com a parede
+function checkWallCollision() {
+  if (ball.x + ball.speedX > canvas.width - ball.radius || ball.x + ball.speedX < ball.radius) {
+    ball.speedX = -ball.speedX;
+  }
+  if (ball.y + ball.speedY < ball.radius) {
+    ball.speedY = -ball.speedY;
+  }
+}
+
+// Função de detecção de colisão da bola com a raquete
+function checkPaddleCollision() {
+  if (
+    ball.x > paddle.x &&
+    ball.x < paddle.x + paddle.width &&
+    ball.y + ball.radius > paddle.y
+  ) {
+    ball.speedY = -ball.speedY;
+  }
+}
+
+// Função principal de atualização e renderização do jogo
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  checkWallCollision();
+  checkPaddleCollision();
+
+  ball.x += ball.speedX;
+  ball.y += ball.speedY;
+
+  if (leftPressed && paddle.x > 0) {
+    paddle.x -= paddle.speed;
+  }
+  if (rightPressed && paddle.x + paddle.width < canvas.width) {
+    paddle.x += paddle.speed;
+  }
+
+  drawBall();
+  drawPaddle();
+
+  requestAnimationFrame(draw);
+}
+
+// Event listeners para controlar a raquete
+document.addEventListener("keydown", (e) => {
+  if (e.key == "Left" || e.key == "ArrowLeft") {
+    leftPressed = true;
+  }
+  if (e.key == "Right" || e.key == "ArrowRight") {
+    rightPressed = true;
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key == "Left" || e.key == "ArrowLeft") {
+    leftPressed = false;
+  }
+  if (e.key == "Right" || e.key == "ArrowRight") {
+    rightPressed = false;
+  }
+});
+
+draw();
