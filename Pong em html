@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #canvas {
+            background-color: black;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="400"></canvas>
+
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        // Definir posições e velocidades iniciais da bola e raquetes
+        let ballX = canvas.width / 2;
+        let ballY = canvas.height / 2;
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+        let paddle1Y = 150;
+        let paddle2Y = 150;
+        const PADDLE_HEIGHT = 100;
+        const PADDLE_THICKNESS = 10;
+
+        // Função para desenhar um retângulo
+        function drawRect(leftX, topY, width, height, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(leftX, topY, width, height);
+        }
+
+        // Função para desenhar a bola
+        function drawBall(centerX, centerY, radius, color) {
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
+            ctx.fill();
+        }
+
+        // Função para atualizar a posição da bola
+        function moveBall() {
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            // Verificar colisão com as raquetes
+            if (ballX < PADDLE_THICKNESS) {
+                if (ballY > paddle1Y && ballY < paddle1Y + PADDLE_HEIGHT) {
+                    ballSpeedX = -ballSpeedX;
+                }
+            }
+            if (ballX > canvas.width - PADDLE_THICKNESS) {
+                if (ballY > paddle2Y && ballY < paddle2Y + PADDLE_HEIGHT) {
+                    ballSpeedX = -ballSpeedX;
+                }
+            }
+
+            // Verificar colisão com as bordas superior e inferior
+            if (ballY < 0 || ballY > canvas.height) {
+                ballSpeedY = -ballSpeedY;
+            }
+        }
+
+        // Função principal do jogo
+        function gameLoop() {
+            moveBall();
+
+            // Limpar o canvas
+            drawRect(0, 0, canvas.width, canvas.height, "black");
+
+            // Desenhar as raquetes
+            drawRect(0, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT, "white");
+            drawRect(canvas.width - PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT, "white");
+
+            // Desenhar a bola
+            drawBall(ballX, ballY, 10, "white");
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Iniciar o loop do jogo
+        gameLoop();
+    </script>
+</body>
+</html>
